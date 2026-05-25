@@ -10,6 +10,11 @@ export interface FacebookConfig {
   accessToken: string
 }
 
+export interface ThreadsConfig {
+  userId: string
+  accessToken: string
+}
+
 export interface TwitterConfig {
   apiKey: string
   apiSecret: string
@@ -20,6 +25,7 @@ export interface TwitterConfig {
 export interface Config {
   mastodon?: MastodonConfig
   facebook?: FacebookConfig
+  threads?: ThreadsConfig
   twitter?: TwitterConfig
 }
 
@@ -37,6 +43,13 @@ export function loadConfig(): Config {
         ? {
             pageId: process.env.FACEBOOK_PAGE_ID,
             accessToken: process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
+          }
+        : undefined,
+    threads:
+      process.env.THREADS_USER_ID && process.env.THREADS_ACCESS_TOKEN
+        ? {
+            userId: process.env.THREADS_USER_ID,
+            accessToken: process.env.THREADS_ACCESS_TOKEN,
           }
         : undefined,
     twitter:
