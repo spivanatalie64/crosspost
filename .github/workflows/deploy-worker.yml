@@ -26,7 +26,7 @@ jobs:
       - name: Set route
         run: |
           curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/zones/${{ vars.CLOUDFLARE_ZONE_ID }}/workers/routes" \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/workers/routes" \
             -H "X-Auth-Email: ${{ vars.ACME_EMAIL }}" \
             -H "X-Auth-Key: ${{ secrets.CLOUDFLARE_API_KEY }}" \
             -H "Content-Type: application/json" \
