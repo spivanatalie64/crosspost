@@ -2,55 +2,74 @@ name: Renew SSL
 
 on:
   schedule:
-    - cron: '0 0 */10 * *'   # every 10 days
+    - cron: '0 0 */10 * *'
   workflow_dispatch:
 
 jobs:
   cert:
     runs-on: ubuntu-latest
     steps:
-      - name: Install certbot with Cloudflare plugin
+      - name: Install certbot
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq certbot python3-certbot-dns-cloudflare
+          sudo apt-get install -y -qq certbot
 
-      - name: Create Cloudflare credentials file
+      - name: Renew or obtain certificate
         run: |
-          mkdir -p ~/.secrets
-          cat > ~/.secrets/cloudflare.ini <<EOF
-          dns_cloudflare_api_token = ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          EOF
-          chmod 600 ~/.secrets/cloudflare.ini
+          DOMAIN="blog.natalie.acreetionos.org"
 
-      - name: Obtain or renew certificate
-        run: |
+          # Try auto-renewal first (works if cert already exists and DNS is live)
+          sudo certbot renew --non-interactive --quiet 2>&1 && echo "✓ Renewed existing cert" && exit 0
+
+          # Not yet issued or renewal failed — do manual DNS challenge
+          sudo mkdir -p /tmp/le-challenge
+
+          # Run certbot manually via auth hook to capture challenge
           sudo certbot certonly \
-            --dns-cloudflare \
-            --dns-cloudflare-credentials ~/.secrets/cloudflare.ini \
-            -d blog.natalie.acreetionos.org \
-            --email ACME_EMAIL \
-            --agree-tos \
-            --non-interactive \
+            --manual \
             --preferred-challenges dns \
+            -d "$DOMAIN" \
+            --email ${{ vars.ACME_EMAIL }} \
+            --agree-tos \
+            --no-eff-email \
+            --manual-public-ip-logging-ok \
             --country US \
             --state $STATE \
-            --city "$CITY" \
-            --org "$ORG" \
-            --keep-until-expiring
+            --city "${{ vars.CERT_LOCATION }}" \
+            --org "${{ vars.CERT_ORG }}" \
+            --keep-until-expiring \
+            --manual-auth-hook 'echo "$CERTBOT_VALIDATION" | sudo tee /tmp/le-challenge/txt' \
+            --non-interactive \
+            --max-validation-time 3600 \
+            2>&1 && echo "✓ Certificate issued" && exit 0
+
+          # If we got here, certbot failed — likely need DNS setup
+          CHAL=$(sudo cat /tmp/le-challenge/txt 2>/dev/null)
+          if [ -n "$CHAL" ]; then
+            echo "=== ACTION REQUIRED ===" >> $GITHUB_STEP_SUMMARY
+            echo "Add this TXT record to Cloudflare DNS:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Name:** \`_acme-challenge.blog.natalie.acreetionos.org\`" >> $GITHUB_STEP_SUMMARY
+            echo "**Type:** TXT" >> $GITHUB_STEP_SUMMARY
+            echo "**Value:** \`$CHAL\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Then re-run this workflow." >> $GITHUB_STEP_SUMMARY
+
+            echo ""
+            echo "❄️  Add this TXT record to Cloudflare:"
+            echo ""
+            echo "  _acme-challenge.blog.natalie.acreetionos.org  TXT  \"$CHAL\""
+            echo ""
+            echo "Then re-run this workflow."
+          fi
 
       - name: Show certificate info
+        if: always()
         run: |
           CERT_DIR="/etc/letsencrypt/live/blog.natalie.acreetionos.org"
           if [ -d "$CERT_DIR" ]; then
+            echo "✓ Certificate exists:"
             sudo openssl x509 -in "$CERT_DIR/fullchain.pem" -noout -text | grep -E "Subject:|Not Before|Not After"
-            echo "✓ Certificate renewed"
           else
-            echo "✗ Certificate directory not found"
-            exit 1
+            echo "No certificate directory yet — complete the DNS step first."
           fi
-
-      - name: Upload certificate as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: blog-natalie-acreetionos-cert
-          path: /etc/letsencrypt/live/blog.natalie.acreetionos.org/
