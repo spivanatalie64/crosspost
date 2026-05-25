@@ -1,0 +1,33 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+    paths: [workers/**]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy worker
+        run: |
+          SCRIPT=$(cat workers/proxy-worker.js | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+
+          curl -s -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${{ vars.CLOUDFLARE_ACCOUNT_ID }}/workers/scripts/blog-proxy" \
+            -H "X-Auth-Email: ${{ vars.ACME_EMAIL }}" \
+            -H "X-Auth-Key: ${{ secrets.CLOUDFLARE_API_KEY }}" \
+            -H "Content-Type: application/javascript" \
+            --data "{\"script\": $SCRIPT}" | python3 -c "import sys,json; r=json.load(sys.stdin); print('✓' if r.get('success') else '✗', r.get('errors',''))"
+
+      - name: Set route
+        run: |
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ vars.CLOUDFLARE_ZONE_ID }}/workers/routes" \
+            -H "X-Auth-Email: ${{ vars.ACME_EMAIL }}" \
+            -H "X-Auth-Key: ${{ secrets.CLOUDFLARE_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{"pattern":"blog.natalie.acreetionos.org/*","script":"blog-proxy"}' | python3 -c "import sys,json; r=json.load(sys.stdin); print('✓' if r.get('success') else '✗', r.get('errors',''))"
