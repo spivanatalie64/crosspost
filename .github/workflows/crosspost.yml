@@ -51,7 +51,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-          CONTENT_PROMPT: ${{ secrets.CONTENT_PROMPT }}
+          CONTENT_PROMPT: ${{ vars.CONTENT_PROMPT }}
 
       - name: Manual post with provided text
         if: github.event_name == 'workflow_dispatch' && inputs.text != ''
