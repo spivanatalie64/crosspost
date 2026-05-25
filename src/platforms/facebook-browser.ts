@@ -32,12 +32,41 @@ export async function postToFacebookBrowser(
     const page = await context.newPage()
 
     await page.goto(FACEBOOK_LOGIN, { waitUntil: 'networkidle' })
-    await delay(2000)
+    await delay(3000)
 
-    await page.fill('input[name="email"]', config.email)
-    await page.fill('input[name="pass"]', config.password)
-    await delay(500)
-    await page.click('button[name="login"]')
+    const emailSelectors = ['input[name="email"]', 'input[type="text"]', '#email']
+    for (const sel of emailSelectors) {
+      const el = await page.$(sel)
+      if (el) { await el.fill(config.email); break }
+    }
+
+    const passSelectors = ['input[name="pass"]', 'input[type="password"]', '#pass']
+    for (const sel of passSelectors) {
+      const el = await page.$(sel)
+      if (el) { await el.fill(config.password); break }
+    }
+
+    await delay(1000)
+
+    const loginBtnSelectors = [
+      'button[name="login"]',
+      'button[type="submit"]',
+      '#loginbutton',
+      'button:has-text("Log in")',
+      'button:has-text("Log In")',
+    ]
+
+    let loggedIn = false
+    for (const sel of loginBtnSelectors) {
+      const el = await page.$(sel)
+      if (el && (await el.isVisible())) {
+        await el.click()
+        loggedIn = true
+        break
+      }
+    }
+    if (!loggedIn) throw new Error('Could not find login button')
+
     await page.waitForLoadState('networkidle')
     await delay(3000)
 
