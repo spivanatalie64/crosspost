@@ -1,0 +1,149 @@
+---
+export interface Props {
+  title: string
+  description: string
+  image?: string
+  pubDate?: Date
+  tags?: string[]
+  canonical?: string
+}
+
+const { title, description, image, pubDate, tags, canonical } = Astro.props
+const site = new URL(Astro.site!)
+const url = canonical ? new URL(canonical, site) : Astro.url
+const ogImage = image || '/og-default.png'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+
+    <title>{title} | acreetionos</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={url} />
+
+    <meta property="og:type" content={pubDate ? 'article' : 'website'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={new URL(ogImage, site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+    {tags?.map(tag => <meta property="article:tag" content={tag} />)}
+
+    <script type="application/ld+json set:html">
+      {JSON.stringify(pubDate ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": title,
+        "description": description,
+        "image": new URL(ogImage, site).toString(),
+        "url": url.toString(),
+        "datePublished": pubDate.toISOString(),
+        "publisher": {
+          "@type": "Organization",
+          "name": "acreetionos",
+          "url": site.toString(),
+        },
+      } : {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "acreetionos",
+        "url": site.toString(),
+        "description": "acreetionos - a cutting-edge operating system project.",
+      })}
+    </script>
+
+    <style>
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+        --accent: #58a6ff;
+        --accent2: #3fb950;
+        --border: #30363d;
+        --muted: #8b949e;
+        --max-w: 720px;
+        --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding: 1.5rem 1rem;
+      }
+      nav {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+      nav a { color: var(--fg); font-weight: 600; font-size: 1.1rem; }
+      nav a:hover { color: var(--accent); text-decoration: none; }
+      main {
+        max-width: var(--max-w);
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      h1 { font-size: 2rem; line-height: 1.3; margin-bottom: 0.5rem; }
+      h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 0.5rem; }
+      p { margin-bottom: 1rem; color: var(--muted); }
+      code {
+        font-family: var(--font-mono);
+        background: #161b22;
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre code { padding: 1rem; display: block; overflow-x: auto; }
+      .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+      .tag {
+        display: inline-block;
+        background: #1f2937;
+        color: var(--accent);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-right: 0.3rem;
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      footer a { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">acreetionos</a>
+        <a href="/">Blog</a>
+        <a href="https://acreetionos.org" target="_blank">Project</a>
+        <a href="https://discord.acreetionos.org" target="_blank">Discord</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>acreetionos — <a href="https://acreetionos.org">acreetionos.org</a> &middot; <a href="https://discord.acreetionos.org">Discord</a> &middot; <a href="/rss.xml">RSS</a></p>
+    </footer>
+  </body>
+</html>

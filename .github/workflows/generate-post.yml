@@ -1,0 +1,28 @@
+name: Generate Blog Post
+
+on:
+  schedule:
+    - cron: '0 12 * * 1,3,5'   # Mon/Wed/Fri at noon UTC
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx src/scripts/generate-post.ts
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL }}
+          CONTENT_PROMPT: ${{ secrets.CONTENT_PROMPT }}
+      - run: |
+          git config user.name "blog-bot"
+          git config user.email "bot@acreetionos.org"
+          git add src/content/posts/
+          git diff --staged --quiet || git commit -m "Auto-generate blog post"
+          git push
