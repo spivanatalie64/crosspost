@@ -61,21 +61,13 @@ We tested AcreetionOS 1.0 (kernel 6.12.x, Cinnamon 6.4) against a base Arch inst
 | Boot time (systemd-analyze) | 4.2s | 4.8s | −12.5% |
 | Idle RAM usage (after login) | 1.1 GB | 1.3 GB | −15.4% |
 | glxgears (Cinnamon) | 14,200 FPS | 13,800 FPS | +2.9% |
-| DNF/dnf trace (package install) | 23s | 25s | −8.0% |
+| Package install (pacman) | 23s | 25s | −8.0% |
 
 The improvements come from AcreetionOS's pre-tuned kernel parameters, optimized Cinnamon theming, and curated default service set — without sacrificing security.
 
-## Security-First Rolling Updates
+## Staying Current with Upstream
 
-AcreetionOS's package repositories are pinned against upstream Arch, but with an additional verification layer. The `acreetion-security-check` tool (included by default) runs before every `pacman -Syu` to flag any packages with known unpatched CVEs:
-
-```bash
-sudo acreetion-security-check
-# Checking 1,842 installed packages...
-# ✓ All packages are up-to-date against known CVEs.
-```
-
-This is especially important for rolling-release distributions where the window between an upstream fix and your install can be hours — not weeks as with point-release distros.
+AcreetionOS follows Arch Linux's rolling release model. Regular `sudo pacman -Syu` keeps your system up to date with the latest kernel, security patches, and Cinnamon features. This is especially important for rolling-release distributions where the window between an upstream fix and your install can be hours — not weeks as with point-release distros.
 
 ## Summary
 

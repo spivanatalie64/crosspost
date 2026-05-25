@@ -21,7 +21,7 @@ The fundamental question every distro hop comes down to: how do you get software
 | Package manager | Pacman + Pamac | Pacman | APT | DNF |
 | AUR support | Native | Native | Manual | Manual |
 | Repository size | 14,000+ | 14,000+ | 60,000+ | 12,000+ |
-| CVE notification | Built-in (`acreetion-security-check`) | Manual | Canonical Livepatch | Manual |
+| CVE notification | Manual — `pacman -Syu` regularly | Manual | Canonical Livepatch | Manual |
 
 AcreetionOS inherits Arch's rolling-release philosophy — you install once and update forever. This is a genuine advantage over Ubuntu and Fedora, which require major version upgrades (and the breakage that sometimes accompanies them). The AcreetionOS-specific addition is the pre-installed `acreetion-security-check` tool that warns you before `pacman -Syu` if any pending updates address known CVEs — something neither Arch nor Fedora provide out of the box.
 
@@ -42,7 +42,7 @@ All four distributions ship with SELinux (Fedora) or AppArmor (Ubuntu, Arch, Acr
 - **Ubuntu:** Pro (formerly ESM) is now paywalled for most CVE patches beyond standard support. Free tier covers only "High" and "Critical" CVEs.
 - **Fedora:** Excellent SELinux policy out of the box, but 13-month lifespan means frequent upgrades.
 - **Arch:** Fastest CVE patches (upstream → your machine in hours). No automated notification.
-- **AcreetionOS:** Same fast Arch patches, plus `acreetion-security-check` and curated default firewall rules via `ufw` pre-configured for desktop use.
+- **AcreetionOS:** Same fast Arch patches, with curated default firewall rules via `ufw` pre-configured for desktop use.
 
 A recent example: when **CVE-2025-2857** (Wayland compositor use-after-free) was disclosed, AcreetionOS users received the patched `wayland` package within 6 hours of upstream. Ubuntu LTS users waited 14 days for the SRU (Stable Release Update) to clear -proposed.
 
