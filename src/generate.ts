@@ -3,11 +3,12 @@ import OpenAI from 'openai'
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1'
 
 const FREE_MODELS = [
-  'google/gemini-2.0-flash-lite-preview-02-05:free',
   'meta-llama/llama-3.2-3b-instruct:free',
-  'qwen/qwen2.5-7b-instruct:free',
-  'microsoft/phi-3.5-mini-4k-instruct:free',
-  'deepseek/deepseek-chat:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'deepseek/deepseek-v4-flash:free',
+  'qwen/qwen3-coder:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'liquid/lfm-2.5-1.2b-instruct:free',
 ]
 
 function pickModel(): string {
