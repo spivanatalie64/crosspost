@@ -3,7 +3,6 @@
 import { Command } from 'commander'
 import { loadConfig } from './config.js'
 import { generatePost } from './generate.js'
-import { postToBluesky } from './platforms/bluesky.js'
 import { postToMastodon } from './platforms/mastodon.js'
 import { postToFacebook } from './platforms/facebook.js'
 import { postToTwitter } from './platforms/twitter.js'
@@ -39,7 +38,6 @@ async function main(): Promise<void> {
   const config = loadConfig()
   const posts: Promise<PostResult>[] = []
 
-  if (config.bluesky) posts.push(postToBluesky(config.bluesky, text, options.image))
   if (config.mastodon) posts.push(postToMastodon(config.mastodon, text, options.image))
   if (config.facebook) posts.push(postToFacebook(config.facebook, text, options.image))
   if (config.twitter) posts.push(postToTwitter(config.twitter, text, options.image))

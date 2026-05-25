@@ -1,10 +1,5 @@
 import 'dotenv/config'
 
-export interface BlueskyConfig {
-  handle: string
-  password: string
-}
-
 export interface MastodonConfig {
   instance: string
   token: string
@@ -23,7 +18,6 @@ export interface TwitterConfig {
 }
 
 export interface Config {
-  bluesky?: BlueskyConfig
   mastodon?: MastodonConfig
   facebook?: FacebookConfig
   twitter?: TwitterConfig
@@ -31,13 +25,6 @@ export interface Config {
 
 export function loadConfig(): Config {
   return {
-    bluesky:
-      process.env.BLUESKY_HANDLE && process.env.BLUESKY_APP_PASSWORD
-        ? {
-            handle: process.env.BLUESKY_HANDLE,
-            password: process.env.BLUESKY_APP_PASSWORD,
-          }
-        : undefined,
     mastodon:
       process.env.MASTODON_INSTANCE && process.env.MASTODON_ACCESS_TOKEN
         ? {
