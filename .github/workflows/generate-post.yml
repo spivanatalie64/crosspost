@@ -2,7 +2,7 @@ name: Generate Blog Post
 
 on:
   schedule:
-    - cron: '0 12 * * 1,3,5'   # Mon/Wed/Fri at noon UTC
+    - cron: '0 1,6,11,16,21 * * *'   # 5x daily: 01:00, 06:00, 11:00, 16:00, 21:00 UTC
   workflow_dispatch:
 
 jobs:
