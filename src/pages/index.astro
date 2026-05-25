@@ -7,44 +7,40 @@ posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
 ---
 
 <BaseLayout title="Blog" description="Latest news and updates from the AcreetionOS operating system project. Maintained by Natalie Spiva.">
-  <div class="hero">
-    <span class="hero-icon">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="40" height="40" rx="10" stroke="#2ecc71" stroke-width="2" fill="rgba(46,204,113,0.06)"/>
-        <text x="24" y="30" text-anchor="middle" font-family="'Fira Code', monospace" font-size="20" font-weight="700" fill="#2ecc71">A</text>
-      </svg>
-    </span>
-    <h1><span>AcreetionOS</span> Blog</h1>
-    <p>Updates, development progress, and community news from the project.</p>
-  </div>
-
-  <div class="divider"></div>
+  <article class="content-box">
+    <div class="box-header">
+      <h2><i class="bi bi-newspaper"></i> AcreetionOS Blog</h2>
+    </div>
+    <div class="box-body">
+      <p style="margin: 0; color: var(--acreetion-text);">
+        Updates, development progress, and community news. <a href="/rss.xml"><i class="bi bi-rss"></i> RSS</a>
+      </p>
+    </div>
+  </article>
 
   {posts.length === 0 && (
-    <div class="content-box">
-      <div class="box-body" style="text-align: center; padding: 3rem;">
-        <p style="margin: 0; color: var(--fg-dim);">
-          <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i>
-          No posts yet. Coming soon.
-        </p>
+    <article class="content-box">
+      <div class="box-body" style="text-align: center; padding: 2rem;">
+        <p style="margin: 0;">No posts yet. Coming soon.</p>
       </div>
-    </div>
+    </article>
   )}
 
-  <ul class="post-list">
-    {posts.map((post) => (
-      <li class="post-card">
-        <a href={`/posts/${post.id}`} class="post-card-title">
-          {post.data.title}
-        </a>
-        <div class="meta" style="margin-top: 0.45rem;">
-          <span class="date"><i class="bi bi-calendar3" style="font-size: 0.7rem; margin-right: 0.3rem; opacity: 0.6;"></i>{post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-          <span class="tags">{post.data.tags?.map(tag => <span class="tag">{tag}</span>)}</span>
+  {posts.map((post) => (
+    <article class="content-box post-card">
+      <div class="box-body">
+        <div class="post-header">
+          <span>{post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          <span class="sep">|</span>
+          {post.data.tags?.map(tag => <span class="tag">{tag}</span>)}
         </div>
-        <p style="margin: 0.35rem 0 0; font-size: 0.85rem; position: relative; z-index: 1;">
+        <a href={`/posts/${post.id}`} style="text-decoration: none;">
+          <h1 style="font-size: 1.2rem; color: var(--acreetion-text-bright);">{post.data.title}</h1>
+        </a>
+        <p style="margin: 0.4rem 0 0; color: var(--acreetion-text);">
           {post.data.description}
         </p>
-      </li>
-    ))}
-  </ul>
+      </div>
+    </article>
+  ))}
 </BaseLayout>
