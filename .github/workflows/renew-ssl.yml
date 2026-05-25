@@ -19,7 +19,7 @@ jobs:
           gh api repos/spivanatalie64/acreetionos-blog/pages -X PUT \
             -f cname='blog.natalie.acreetionos.org'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Wait for certificate to be issued
         run: |
